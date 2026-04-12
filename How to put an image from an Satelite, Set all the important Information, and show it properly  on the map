@@ -1,0 +1,25 @@
+// coletagem dos dados de imagem do satélite em questão
+var collection = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED');
+// criação da área
+var lugar = ee.Geometry.Rectangle([-45,-23,-44,-22]);
+//
+
+// pegar a imagem filtrada dentro do limite que eu estabeleci; Imagem
+var filtrada = collection
+.filterBounds(lugar)
+.filterDate('2025-01-01', '2025-12-01')
+.sort('CLOUDY_PIXEL_PERCENTAGE',true);
+// vai mostrar as informações
+print(filtrada);
+// ver a primeira imagem do satélite
+var imagem = filtrada.first();
+
+// pra centralizar na área de interesse
+Map.centerObject(lugar,10)
+
+// adicionando a imagem de fato
+Map.addLayer(imagem, {
+  bands: ['B4','B3','B2'],
+  min : 0,
+  max: 3000
+}, 'Algum lugar entre Rio e São Paulo' );
