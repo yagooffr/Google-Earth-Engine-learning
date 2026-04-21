@@ -1,0 +1,26 @@
+var s2 = ee.ImageCollection('COPERNICUS/S2_HARMONIZED');
+var urban = ee.FeatureCollection('projects/learning-492416/assets/ghs_urban_centers');
+
+var filtrada = urban
+.filter(ee.Filter.eq('UC_NM_MN', 'Rio de Janeiro'))
+.filter(ee.Filter.eq('CTR_MN_NM','Brazil'));
+
+var geometry = filtrada.geometry();
+
+var rgbVis = {
+  min:0,
+  max:3000,
+  bands:['B4','B3','B2'],
+};
+
+var filtrada = s2
+.filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE',30))
+.filter(ee.Filter.date('2024-01-01', '2025-01-01'))
+.filter(ee.Filter.bounds(geometry));
+
+var image = filtrada.median();
+
+var clipped = image.clip(geometry);
+
+Map.centerObject(geometry,10);
+Map.addLayer(clipped,rgbVis,"clipped");
