@@ -1,0 +1,35 @@
+var Lic = ee.ImageCollection('NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG')
+.filter(ee.Filter.date('2020-05-01', '2020-06-01'));
+
+var nighttime = Lic.select('avg_rad');
+var nighttimeVis = {min:0, max:60};
+
+var urban = ee.FeatureCollection('projects/learning-492416/assets/ghs_urban_centers');
+
+
+var filtrada = urban
+.filter(ee.Filter.eq('UC_NM_MN','Rio de Janeiro'))
+.filter(ee.Filter.eq('CTR_MN_NM','Brazil'));
+
+var geometry = filtrada.geometry();
+
+var image = ee.Image(nighttime.first());
+
+var clipped = image.clip(geometry);
+
+Map.centerObject(geometry);
+Map.addLayer(clipped,nighttimeVis,"rio");
+
+var exportImage = clipped.select('avg_rad');
+
+// Export raw image with original pixel values
+Export.image.toDrive({
+    image: exportImage,
+    description: 'Light_2015_May_RJrj',
+    folder: 'earthengine',
+    fileNamePrefix: 'Light_2015_May_RJrj',
+    region: geometry,
+    scale: 500,
+    maxPixels: 1e9
+});
+
