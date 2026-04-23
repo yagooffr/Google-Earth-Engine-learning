@@ -1,0 +1,12 @@
+var exportImage = clipped.select('B.*');
+
+// Export raw image with original pixel values
+Export.image.toDrive({
+    image: exportImage,
+    description: 'Urban_Center_Rj_RJ',
+    folder: 'earthengine',
+    fileNamePrefix: 'Urban_Center_Rj_RJ',
+    region: geometry,
+    scale: 10,
+    maxPixels: 1e9
+});
