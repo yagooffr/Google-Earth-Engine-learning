@@ -25,9 +25,9 @@ var exportImage = clipped.select('avg_rad');
 // Export raw image with original pixel values
 Export.image.toDrive({
     image: exportImage,
-    description: 'Light_2015_May_RJrj',
+    description: 'Light_2020_May_RJrj',
     folder: 'earthengine',
-    fileNamePrefix: 'Light_2015_May_RJrj',
+    fileNamePrefix: 'Light_2020_May_RJrj',
     region: geometry,
     scale: 500,
     maxPixels: 1e9
