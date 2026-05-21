@@ -1,0 +1,47 @@
+var s2 = ee.ImageCollection('COPERNICUS/S2_HARMONIZED');
+var admin1 = ee.FeatureCollection('FAO/GAUL_SIMPLIFIED_500m/2015/level1');
+    
+// Select an Admin1 region
+var filteredAdmin1 = admin1
+.filter(ee.Filter.eq('ADM1_NAME','Rio De Janeiro'));
+var geometry = filteredAdmin1.geometry();
+Map.centerObject(geometry,10);
+
+var rgbVis = {min: 0.00 , max: 3000.00, bands: ['B4', 'B3', 'B2']};
+
+var filteredS2 = s2.filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE','30'))
+.filter(ee.Filter.date('2019-01-01', '2020-01-02'))
+.filter(ee.Filter.bounds(geometry));
+var composite = filteredS2.median();
+Map.addLayer(composite.clip(geometry), rgbVis, 'Admin1 Composite');
+
+// This function calculates both NDVI and NDWI indices
+// and returns an image with 2 new bands added to the original image.
+function addIndices(image){
+  var ndvi = image.normalizedDifference(['B8','B4']).rename('ndvi');
+  var ndwi = image.normalizedDifference(['B3','B8']).rename('ndwi');
+  return image.addBands(ndvi).addBands(ndwi);
+}
+
+
+// Map the function over the collection
+var withIndices = filteredS2.map(addIndices);
+
+// Composite
+var composite = withIndices.median();
+print(composite);
+
+// Exercise
+// Display a map of NDWI for the region
+// Select the 'ndwi' band and clip it before displaying
+// Use a color palette from https://colorbrewer2.org/
+
+var ndviComposite = composite.select('nvdi');
+
+var pallete = ['#e5f5f9','#99d8c9','#2ca25f'];
+
+var ndviVis = {min:0.0, max: 0.5, pallete : pallete};
+
+Map.addLayer(ndviComposite,ndviVis,'ndvi');
+
+// Hint: Use .select() function to select a band
